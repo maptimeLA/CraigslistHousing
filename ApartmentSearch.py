@@ -14,8 +14,11 @@ idx = index.Index()
 
 idx.insert(1, (34.112352, -118.073473, 34.113318, -118.071612))
 
+
+print(list(idx.intersection((34.112542, -118.072567, 34.112542, -118.072567))))
+
 print(result['geotag'])
-print(location)
+
 
 
 
