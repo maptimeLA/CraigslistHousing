@@ -12,7 +12,7 @@ result = {'id': '6301716374', 'name': 'Beautiful and spacious 1bd in central are
 
 idx = index.Index()
 
-idx.insert(1, (34.113318, -118.071612, 34.112352, -118.073473))
+idx.insert(1, (34.112352, -118.073473, 34.113318, -118.071612))
 
 print(result['geotag'])
 print(location)
