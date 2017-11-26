@@ -1,30 +1,50 @@
 	
+##Resource https://www.dataquest.io/blog/apartment-finding-slackbot/
+
 from craigslist import CraigslistHousing
 from rtree import index
+import json
 
 #Creating Index
 idx = index.Index()
 
-#Adding Giant Box to index
-idx.insert(1, (-118.156726, 34.083989, -117.950682, 34.211280))
+with open('GoldLineStations.geojson') as f:
+    data = json.load(f)
+
+#Conversion of Half Mile to Latitude and Longitude approximated for Los Angeles, CA
+halfMileLat = 0.006955
+halfMileLong = 0.009119
+featureIndex = 0
+
+for feature in data['features']:
+    point = feature['geometry']['coordinates']
+    latitude = point[1]
+    longitude = point[0]
+    #print(str(latitude) + ', ' + str(longitude))
+    idx.insert(featureIndex, ((longitude - halfMileLong), (latitude - halfMileLat), (longitude + halfMileLong), (latitude + halfMileLat)))
+    featureIndex += 1
+    
+print("Index Complete")
+
 
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
-                         filters={'max_price': 1300, 'zip_code': 91106, 'search_distance': 10, 'max_bedrooms': 1})
+                         filters={'max_price': 1500, 'max_bedrooms': 1})
 
 for result in cl_h.get_results(sort_by='newest', geotagged=True):
     try:
         location = result['geotag']
         latitude = location[0]
-        #print(latitude)
         longitude = location[1]
-        #print(longitude)
+        #print(str(latitude) + ', ' + str(longitude))
     except:
         continue
 
     query = list(idx.intersection((longitude, latitude, longitude, latitude)))
-    print(query)
+    #print(query)
     if not query:
-        print("Outside Search Area")
+        continue
+        #print("Outside Search Area")
     else:
         print(result['geotag'])
+        print(result['url'])
     
