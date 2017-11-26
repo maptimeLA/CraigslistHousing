@@ -1,6 +1,7 @@
-	
-##Resource https://www.dataquest.io/blog/apartment-finding-slackbot/
-##Resource https://suhas.org/sqlalchemy-tutorial/
+##Resources
+##https://www.dataquest.io/blog/apartment-finding-slackbot/
+##https://opensource.com/article/17/10/set-postgres-database-your-raspberry-pi
+##https://suhas.org/sqlalchemy-tutorial/
 
 
 from craigslist import CraigslistHousing
