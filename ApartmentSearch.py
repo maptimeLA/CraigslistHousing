@@ -1,5 +1,7 @@
 	
 ##Resource https://www.dataquest.io/blog/apartment-finding-slackbot/
+##Resource https://suhas.org/sqlalchemy-tutorial/
+
 
 from craigslist import CraigslistHousing
 from rtree import index
@@ -47,4 +49,5 @@ for result in cl_h.get_results(sort_by='newest', geotagged=True):
     else:
         print(result['geotag'])
         print(result['url'])
+        print(data['features'][query[0]]['properties']['STATION'])
     
