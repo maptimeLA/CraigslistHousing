@@ -91,6 +91,6 @@ while var == 1:
                 username='pybot', icon_emoji=':robot_face:'
                 )
                 posted.append(result['id'])
-    print("Pausing for 5min")
+    print("Pausing for 15min")
     print(posted)
-    time.sleep(300)
+    time.sleep(900)
