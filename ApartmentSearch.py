@@ -74,7 +74,7 @@ while var == 1:
         closestStation = findNearest(data, latitude, longitude)
         closestStationName = closestStation[0]
         print(closestStation)
-        closestStationDist = float(closestStation[1])
+        closestStationDist = round(float(closestStation[1]),2)
         print(closestStationDist)
         
         if float(closestStationDist) > 0.5:
