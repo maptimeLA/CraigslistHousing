@@ -8,10 +8,10 @@
 from craigslist import CraigslistHousing
 import json
 from math import radians, cos, sin, asin, sqrt
-#from slackclient import SlackClient
+from slackclient import SlackClient
 import time
+import private
 
-SLACK_TOKEN = "SlackTokenHere"
 SLACK_CHANNEL = "#craigslist"
 
 def coord_distance(lon1, lat1, lon2, lat2):
@@ -58,7 +58,7 @@ with open('GoldLineStations.geojson') as f:
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
 
-#sc = SlackClient(SLACK_TOKEN)
+sc = SlackClient(private.SLACK_TOKEN)
 var = 1
 posted = []
 while var == 1:
