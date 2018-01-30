@@ -3,6 +3,8 @@
 ##https://opensource.com/article/17/10/set-postgres-database-your-raspberry-pi
 ##https://suhas.org/sqlalchemy-tutorial/
 ##https://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
+## How I finally got libspatialindex to install in the raspberry pi. RTree package is dependent on it.
+##http://www.donkeycar.com/faq/how-do-i-manually-install-the-software-on-raspberry-pi
 
 
 from craigslist import CraigslistHousing
@@ -10,7 +12,11 @@ import json
 from math import radians, cos, sin, asin, sqrt
 from slackclient import SlackClient
 import time
+
+import os
 import private
+
+
 
 SLACK_CHANNEL = "#craigslist"
 
@@ -93,6 +99,6 @@ while var == 1:
                 #username='pybot', icon_emoji=':robot_face:'
                 #)
                 posted.append(result['id'])
-    print("Pausing for 5min")
+    print("Pausing for 15min")
     print(posted)
-    time.sleep(300)
+    time.sleep(900)
