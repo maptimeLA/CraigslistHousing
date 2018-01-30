@@ -10,11 +10,10 @@
 from craigslist import CraigslistHousing
 import json
 from math import radians, cos, sin, asin, sqrt
-from slackclient import SlackClient
+#from slackclient import SlackClient
 import time
-
 import os
-import private
+#import private
 
 
 
@@ -64,10 +63,12 @@ with open('GoldLineStations.geojson') as f:
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
 
-sc = SlackClient(private.SLACK_TOKEN)
-var = 1
-posted = []
-while var == 1:
+#sc = SlackClient(private.SLACK_TOKEN)
+with open('apartments.geojson') as f:
+    apartments = json.load(f)
+    
+while True:
+    tempResults = {}
     for result in cl_h.get_results(sort_by='newest', geotagged=True):
         try:
             location = result['geotag']
@@ -87,7 +88,8 @@ while var == 1:
             continue
             #print("Outside Search Area")
         else:
-            if result['id'] in posted:
+            if result['id'] in results:
+                print("Already Saw It!")
                 continue
             else:
                 print(result['geotag'])
@@ -99,6 +101,9 @@ while var == 1:
                 #username='pybot', icon_emoji=':robot_face:'
                 #)
                 posted.append(result['id'])
+                tempResults.update(result)
+    with open('apartments.geojson', 'w') as outfile:
+        json.dump(tempResults, outfile)
     print("Pausing for 15min")
     print(posted)
     time.sleep(900)
