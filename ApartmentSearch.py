@@ -8,13 +8,14 @@
 
 
 from craigslist import CraigslistHousing
-from rtree import index
 import json
 from math import radians, cos, sin, asin, sqrt
 from slackclient import SlackClient
 import time
+
 import os
 import private
+
 
 
 SLACK_CHANNEL = "#craigslist"
@@ -36,27 +37,29 @@ def coord_distance(lon1, lat1, lon2, lat2):
     mi = km * 0.621371
     return mi
 
-#Creating Index
-idx = index.Index()
+# Function to search features in the GeoJson and return the nearest
+def findNearest(data, lat, lon):
+    nearStation = []
+    nearDist = []
+    for feature in data['features']:
+        point = feature['geometry']['coordinates']
+        latitude = point[1]
+        longitude = point[0]
+        station = feature['properties']['STATION']
+        #calculate distance between apartment and station
+        dist = coord_distance(lon, lat, longitude, latitude)
+        if len(nearDist) == 0:
+            nearDist.insert(0, dist)
+            nearStation.insert(0, station)
+        elif dist < nearDist[0]:
+            nearDist[0] = dist
+            nearStation[0] = station
+    result = [nearStation[0], nearDist[0]]
+    return result
+        
 
 with open('GoldLineStations.geojson') as f:
     data = json.load(f)
-
-#Conversion of Half Mile to Latitude and Longitude approximated for Los Angeles, CA
-halfMileLat = 0.006955
-halfMileLong = 0.009119
-featureIndex = 0
-
-for feature in data['features']:
-    point = feature['geometry']['coordinates']
-    latitude = point[1]
-    longitude = point[0]
-    #print(str(latitude) + ', ' + str(longitude))
-    idx.insert(featureIndex, ((longitude - halfMileLong), (latitude - halfMileLat), (longitude + halfMileLong), (latitude + halfMileLat)))
-    featureIndex += 1
-    
-print("Index Complete")
-
 
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
@@ -74,9 +77,13 @@ while var == 1:
         except:
             continue
 
-        query = list(idx.intersection((longitude, latitude, longitude, latitude)))
-        #print(query)
-        if not query:
+        closestStation = findNearest(data, latitude, longitude)
+        closestStationName = closestStation[0]
+        print(closestStation)
+        closestStationDist = round(float(closestStation[1]),2)
+        print(closestStationDist)
+        
+        if float(closestStationDist) > 0.5:
             continue
             #print("Outside Search Area")
         else:
@@ -84,16 +91,13 @@ while var == 1:
                 continue
             else:
                 print(result['geotag'])
-                stationLat = data['features'][query[0]]['properties']['LAT']
-                stationLong = data['features'][query[0]]['properties']['LONG']
-                dist = coord_distance(stationLong, stationLat, result['geotag'][1], result['geotag'][0])
                 print(result['url'])
-                print('Only ' + str(round(dist, 2)) + 'mi from ' + data['features'][query[0]]['properties']['STATION'])
-                desc = "{0} | {1} mi from {2} | {3} | <{4}>".format(result["price"], str(round(dist,2)), data['features'][query[0]]['properties']['STATION'], result["name"], result["url"])
-                sc.api_call(
-                "chat.postMessage", channel=SLACK_CHANNEL, text=desc,
-                username='pybot', icon_emoji=':robot_face:'
-                )
+                print('Only ' + str(closestStationDist) + 'mi from ' + closestStationName)
+                desc = "{0} | {1} mi from {2} | {3} | <{4}>".format(result["price"], str(closestStationDist), closestStationName, result["name"], result["url"])
+                #sc.api_call(
+                #"chat.postMessage", channel=SLACK_CHANNEL, text=desc,
+                #username='pybot', icon_emoji=':robot_face:'
+                #)
                 posted.append(result['id'])
     print("Pausing for 15min")
     print(posted)
