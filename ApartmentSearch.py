@@ -60,6 +60,8 @@ def findNearest(data, lat, lon):
 
 def createFeature(result):
     newFeature = Feature(geometry=Point((result['geotag'][1], result['geotag'][0])))
+    newFeature["properties"]["id"] = result["id"]
+    print(newFeature)
     return newFeature
 
 
@@ -75,6 +77,7 @@ with open('apartments.geojson') as f:
     
 while True:
     posted = apartments["features"]
+    postedID = [item["properties"]["id"] for item in posted]
     for result in cl_h.get_results(sort_by='newest', geotagged=True):
         try:
             location = result['geotag']
@@ -94,7 +97,7 @@ while True:
             continue
             #print("Outside Search Area")
         else:
-            if result['id'] in posted:
+            if result['id'] in postedID:
                 print("Already Saw It!")
                 continue
             else:
@@ -108,11 +111,11 @@ while True:
                 #)
                 feature = createFeature(result)
                 posted.append(feature)
-                print(result)
+                postedID.append(result['id'])
                 #tempResults.update(result)
-    updated = FeatureCollection(posted)
+    apartments["features"]=posted
     with open('apartments.geojson', 'w') as outfile:
-        json.dump(updated, outfile)
+        json.dump(apartments, outfile)
     print("Pausing for 15min")
     print(posted)
     time.sleep(900)
