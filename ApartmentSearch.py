@@ -55,7 +55,11 @@ def findNearest(data, lat, lon):
             nearStation[0] = station
     result = [nearStation[0], nearDist[0]]
     return result
-        
+
+def formatJSON(result):
+    template = { "type": "Feature", "properties": { "id": result["id"], "name": result["name"], "url": result["url"], "datetime": result["datetime"], "price": result["price"] , "where": result["where"], "bedrooms": result['bedrooms'], "area": result['area'], "LAT": result['geotag'][0], "LONG": result['geotag'][1], "geometry": { "type": "Point", "coordinates": [ result['geotag'][1], result['geotag'][0] ] } } }
+    return template
+
 
 with open('GoldLineStations.geojson') as f:
     data = json.load(f)
@@ -68,7 +72,7 @@ with open('apartments.geojson') as f:
     apartments = json.load(f)
     
 while True:
-    tempResults = {}
+    posted = apartments["features"]
     for result in cl_h.get_results(sort_by='newest', geotagged=True):
         try:
             location = result['geotag']
@@ -88,7 +92,7 @@ while True:
             continue
             #print("Outside Search Area")
         else:
-            if result['id'] in results:
+            if result['id'] in posted:
                 print("Already Saw It!")
                 continue
             else:
@@ -100,10 +104,12 @@ while True:
                 #"chat.postMessage", channel=SLACK_CHANNEL, text=desc,
                 #username='pybot', icon_emoji=':robot_face:'
                 #)
-                posted.append(result['id'])
-                tempResults.update(result)
+                formatted = formatJSON(result)
+                apartments['features'].append(formatted)
+                print(result)
+                #tempResults.update(result)
     with open('apartments.geojson', 'w') as outfile:
-        json.dump(tempResults, outfile)
+        json.dump(apartments, outfile)
     print("Pausing for 15min")
     print(posted)
     time.sleep(900)
