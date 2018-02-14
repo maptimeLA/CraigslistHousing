@@ -9,6 +9,8 @@
 
 from craigslist import CraigslistHousing
 import json
+import geojson
+from geojson import Feature, Point, FeatureCollection
 from math import radians, cos, sin, asin, sqrt
 #from slackclient import SlackClient
 import time
@@ -56,20 +58,20 @@ def findNearest(data, lat, lon):
     result = [nearStation[0], nearDist[0]]
     return result
 
-def formatJSON(result):
-    template = { "type": "Feature", "properties": { "id": result["id"], "name": result["name"], "url": result["url"], "datetime": result["datetime"], "price": result["price"] , "where": result["where"], "bedrooms": result['bedrooms'], "area": result['area'], "LAT": result['geotag'][0], "LONG": result['geotag'][1], "geometry": { "type": "Point", "coordinates": [ result['geotag'][1], result['geotag'][0] ] } } }
-    return template
+def createFeature(result):
+    newFeature = Feature(geometry=Point((result['geotag'][1], result['geotag'][0])))
+    return newFeature
 
 
 with open('GoldLineStations.geojson') as f:
-    data = json.load(f)
+    data = geojson.load(f)
 
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
 
 #sc = SlackClient(private.SLACK_TOKEN)
 with open('apartments.geojson') as f:
-    apartments = json.load(f)
+    apartments = geojson.load(f)
     
 while True:
     posted = apartments["features"]
@@ -104,12 +106,13 @@ while True:
                 #"chat.postMessage", channel=SLACK_CHANNEL, text=desc,
                 #username='pybot', icon_emoji=':robot_face:'
                 #)
-                formatted = formatJSON(result)
-                apartments['features'].append(formatted)
+                feature = createFeature(result)
+                posted.append(feature)
                 print(result)
                 #tempResults.update(result)
+    updated = FeatureCollection(posted)
     with open('apartments.geojson', 'w') as outfile:
-        json.dump(apartments, outfile)
+        json.dump(updated, outfile)
     print("Pausing for 15min")
     print(posted)
     time.sleep(900)
