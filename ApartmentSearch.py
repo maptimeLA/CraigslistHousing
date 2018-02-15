@@ -61,6 +61,11 @@ def findNearest(data, lat, lon):
 def createFeature(result):
     newFeature = Feature(geometry=Point((result['geotag'][1], result['geotag'][0])))
     newFeature["properties"]["id"] = result["id"]
+    newFeature["properties"]["name"] = result["name"]
+    newFeature["properties"]["url"] = result["url"]
+    newFeature["properties"]["datetime"] = result["datetime"]
+    newFeature["properties"]["price"] = result["price"]
+    newFeature["properties"]["bedrooms"] = result["bedrooms"]
     print(newFeature)
     return newFeature
 
