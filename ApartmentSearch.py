@@ -12,10 +12,10 @@ import json
 import geojson
 from geojson import Feature, Point, FeatureCollection
 from math import radians, cos, sin, asin, sqrt
-#from slackclient import SlackClient
+from slackclient import SlackClient
 import time
 import os
-#import private
+import private
 
 
 
@@ -76,7 +76,7 @@ with open('GoldLineStations.geojson') as f:
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
 
-#sc = SlackClient(private.SLACK_TOKEN)
+sc = SlackClient(private.SLACK_TOKEN)
 with open('apartments.geojson') as f:
     apartments = geojson.load(f)
     
@@ -110,10 +110,10 @@ while True:
                 print(result['url'])
                 print('Only ' + str(closestStationDist) + 'mi from ' + closestStationName)
                 desc = "{0} | {1} mi from {2} | {3} | <{4}>".format(result["price"], str(closestStationDist), closestStationName, result["name"], result["url"])
-                #sc.api_call(
-                #"chat.postMessage", channel=SLACK_CHANNEL, text=desc,
-                #username='pybot', icon_emoji=':robot_face:'
-                #)
+                sc.api_call(
+                "chat.postMessage", channel=SLACK_CHANNEL, text=desc,
+                username='pybot', icon_emoji=':robot_face:'
+                )
                 feature = createFeature(result)
                 posted.append(feature)
                 postedID.append(result['id'])
