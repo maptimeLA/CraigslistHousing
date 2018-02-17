@@ -18,9 +18,6 @@ import os
 import private
 
 
-
-SLACK_CHANNEL = "#craigslist"
-
 def coord_distance(lon1, lat1, lon2, lat2):
     """
     Calculate the great circle distance between two points 
@@ -71,7 +68,7 @@ def createFeature(result):
 
 
 #Store path of Feature for any OS
-feature = os.path('.\SearchFeatures\GoldLineStations.geojson')
+feature = os.path.join(".","SearchFeatures", "GoldLineStations.geojson")
 #open feature to be read
 with open(feature) as f:
     data = geojson.load(f)
@@ -80,6 +77,8 @@ cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
 
 sc = SlackClient(private.SLACK_TOKEN)
+SLACK_CHANNEL = "#craigslist"
+
 with open('apartments.geojson') as f:
     apartments = geojson.load(f)
     
