@@ -1,1 +1,0 @@
-{"id": "6475154932", "name": "Studio next to Paseo Colorado Mall, downtown Pasadena", "url": "https://losangeles.craigslist.org/sgv/apa/d/studio-next-to-paseo-colorado/6475154932.html", "datetime": "2018-01-27 13:05", "price": "$1125", "where": "Old town Pasadena, CA", "has_image": true, "has_map": true, "geotag": [34.142658, -118.141651], "bedrooms": "1", "area": null}
