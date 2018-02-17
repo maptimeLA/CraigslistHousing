@@ -12,7 +12,7 @@ import json
 import geojson
 from geojson import Feature, Point, FeatureCollection
 from math import radians, cos, sin, asin, sqrt
-#from slackclient import SlackClient
+from slackclient import SlackClient
 import time
 import os
 import private
@@ -57,7 +57,6 @@ def findNearest(data, lat, lon):
             nearStation[0] = station
     result = [nearStation[0], nearDist[0]]
     return result
-<<<<<<< Updated upstream
 
 def createFeature(result):
     newFeature = Feature(geometry=Point((result['geotag'][1], result['geotag'][0])))
@@ -74,33 +73,16 @@ def createFeature(result):
 with open('GoldLineStations.geojson') as f:
     data = geojson.load(f)
 
-=======
-        
-
-with open('GoldLineStations.geojson') as f:
-    data = json.load(f)
-
->>>>>>> Stashed changes
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
 
-<<<<<<< HEAD
 sc = SlackClient(private.SLACK_TOKEN)
-<<<<<<< Updated upstream
 with open('apartments.geojson') as f:
     apartments = geojson.load(f)
     
 while True:
     posted = apartments["features"]
     postedID = [item["properties"]["id"] for item in posted]
-=======
-=======
-#sc = SlackClient(SLACK_TOKEN)
->>>>>>> origin/DropRTree
-var = 1
-posted = []
-while var == 1:
->>>>>>> Stashed changes
     for result in cl_h.get_results(sort_by='newest', geotagged=True):
         try:
             location = result['geotag']
@@ -113,11 +95,7 @@ while var == 1:
         closestStation = findNearest(data, latitude, longitude)
         closestStationName = closestStation[0]
         print(closestStation)
-<<<<<<< Updated upstream
         closestStationDist = round(float(closestStation[1]),2)
-=======
-        closestStationDist = float(closestStation[1])
->>>>>>> Stashed changes
         print(closestStationDist)
         
         if float(closestStationDist) > 0.5:
@@ -132,7 +110,6 @@ while var == 1:
                 print(result['url'])
                 print('Only ' + str(closestStationDist) + 'mi from ' + closestStationName)
                 desc = "{0} | {1} mi from {2} | {3} | <{4}>".format(result["price"], str(closestStationDist), closestStationName, result["name"], result["url"])
-<<<<<<< Updated upstream
                 sc.api_call(
                 "chat.postMessage", channel=SLACK_CHANNEL, text=desc,
                 username='pybot', icon_emoji=':robot_face:'
@@ -144,13 +121,7 @@ while var == 1:
     apartments["features"]=posted
     with open('apartments.geojson', 'w') as outfile:
         json.dump(apartments, outfile)
-=======
-                #sc.api_call(
-                #"chat.postMessage", channel=SLACK_CHANNEL, text=desc,
-                #username='pybot', icon_emoji=':robot_face:'
-                #)
-                posted.append(result['id'])
->>>>>>> Stashed changes
     print("Pausing for 15min")
     print(posted)
     time.sleep(900)
+
