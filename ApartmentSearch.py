@@ -70,7 +70,10 @@ def createFeature(result):
     return newFeature
 
 
-with open('GoldLineStations.geojson') as f:
+#Store path of Feature for any OS
+feature = os.path('.\SearchFeatures\GoldLineStations.geojson')
+#open feature to be read
+with open(feature) as f:
     data = geojson.load(f)
 
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
