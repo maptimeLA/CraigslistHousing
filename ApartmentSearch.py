@@ -71,7 +71,7 @@ def createFeature(result):
 feature = os.path.join(".","SearchFeatures", "GoldLineStations.geojson")
 #open feature to be read
 with open(feature) as f:
-    data = geojson.load(f)
+    geofeature = geojson.load(f)
 
 cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
                          filters={'max_price': 1500, 'min_price': 1000, 'min_bedrooms':1, 'max_bedrooms': 1})
@@ -79,10 +79,11 @@ cl_h = CraigslistHousing(site='losangeles', area='sgv', category='apa',
 sc = SlackClient(private.SLACK_TOKEN)
 SLACK_CHANNEL = "#craigslist"
 
-with open('apartments.geojson') as f:
-    apartments = geojson.load(f)
+
     
 while True:
+    with open('apartments.geojson') as f:
+        apartments = geojson.load(f)
     posted = apartments["features"]
     postedID = [item["properties"]["id"] for item in posted]
     for result in cl_h.get_results(sort_by='newest', geotagged=True):
@@ -90,11 +91,11 @@ while True:
             location = result['geotag']
             latitude = location[0]
             longitude = location[1]
-            #print(str(latitude) + ', ' + str(longitude))
+            print(str(latitude) + ', ' + str(longitude))
         except:
             continue
 
-        closestStation = findNearest(data, latitude, longitude)
+        closestStation = findNearest(geofeature, latitude, longitude)
         closestStationName = closestStation[0]
         print(closestStation)
         closestStationDist = round(float(closestStation[1]),2)
@@ -103,23 +104,21 @@ while True:
         if float(closestStationDist) > 0.5:
             continue
             #print("Outside Search Area")
+        elif result['id'] in postedID:
+            print("Already Saw It!")
+            continue
         else:
-            if result['id'] in postedID:
-                print("Already Saw It!")
-                continue
-            else:
-                print(result['geotag'])
-                print(result['url'])
-                print('Only ' + str(closestStationDist) + 'mi from ' + closestStationName)
-                desc = "{0} | {1} mi from {2} | {3} | <{4}>".format(result["price"], str(closestStationDist), closestStationName, result["name"], result["url"])
-                sc.api_call(
-                "chat.postMessage", channel=SLACK_CHANNEL, text=desc,
-                username='pybot', icon_emoji=':robot_face:'
-                )
-                feature = createFeature(result)
-                posted.append(feature)
-                postedID.append(result['id'])
-                #tempResults.update(result)
+            #print(result['geotag'])
+            #print(result['url'])
+            #print('Only ' + str(closestStationDist) + 'mi from ' + closestStationName)
+            desc = "{0} | {1} mi from {2} | {3} | <{4}>".format(result["price"], str(closestStationDist), closestStationName, result["name"], result["url"])
+            sc.api_call(
+            "chat.postMessage", channel=SLACK_CHANNEL, text=desc,
+            username='pybot', icon_emoji=':robot_face:'
+            )
+            feature = createFeature(result)
+            posted.append(feature)
+            #tempResults.update(result)
     apartments["features"]=posted
     with open('apartments.geojson', 'w') as outfile:
         json.dump(apartments, outfile)
